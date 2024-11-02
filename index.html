@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>スコア付き限定じゃんけんゲーム - ルール説明</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Chart.js CDN（必要に応じて） -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* リセットCSS */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-image: url('assets/images/janken_background_img.webp');
+            background-size: cover;
+            background-position: center;
+            color: #fff;
+            text-align: center;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px #000;
+        }
+
+        #rules-container {
+            background-color: rgba(0, 0, 0, 0.6);
+            padding: 30px;
+            border-radius: 10px;
+            max-width: 800px;
+            margin: 0 auto;
+            box-shadow: 2px 2px 10px #000;
+        }
+
+        #rules-container h2 {
+            margin-bottom: 15px;
+            text-shadow: 1px 1px 2px #000;
+        }
+
+        #rules-container p {
+            margin-bottom: 15px;
+            line-height: 1.6;
+            text-shadow: 1px 1px 2px #000;
+        }
+
+        #start-button {
+            padding: 15px 30px;
+            margin-top: 20px;
+            font-size: 1.2em;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            background-color: #28a745;
+            color: #fff;
+            box-shadow: 2px 2px 5px #000;
+        }
+
+        #start-button:hover {
+            background-color: #218838;
+        }
+
+        /* モバイル対応 */
+        @media (max-width: 800px) {
+            #rules-container {
+                padding: 20px;
+            }
+
+            #start-button {
+                width: 100%;
+                padding: 15px;
+                font-size: 1.1em;
+            }
+        }
+
+        /* ミュートボタンのスタイル（必要に応じて） */
+        #mute-button {
+            background-color: #17a2b8;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 15px;
+            cursor: pointer;
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            transition: background-color 0.3s;
+        }
+
+        #mute-button:hover {
+            background-color: #138496;
+        }
+    </style>
+</head>
+<body>
+    <!-- ミュートボタン（必要に応じて） -->
+    <button id="mute-button">ミュート</button>
+
+    <h1>スコア付き限定じゃんけんゲーム</h1>
+    <div id="rules-container">
+        <h2>ゲームのルール</h2>
+        <p>
+            ようこそ！このスコア付き限定じゃんけんゲームでは、伝統的なじゃんけんのルールに加えて、ポイントやゴールドを賭ける要素が加わっています。以下にゲームの詳細なルールを説明します。
+        </p>
+        <h3>基本ルール</h3>
+        <p>
+            プレイヤーとAIは、それぞれ手札から「✊（グー）」「✋（パー）」「✌️（チョキ）」のいずれかを選びます。勝敗は通常のじゃんけんと同様です。
+        </p>
+        <h3>スコアリング</h3>
+        <p>
+            勝利すると選んだ手に応じてポイントが加算されます。
+            <ul style="list-style: none; text-align: left; display: inline-block;">
+                <li>✊（グー）: 1ポイント</li>
+                <li>✌️（チョキ）: 2ポイント</li>
+                <li>✋（パー）: 5ポイント</li>
+            </ul>
+            引き分けの場合はポイントは加算されません。
+        </p>
+        <h3>ゴールドとベット</h3>
+        <p>
+            ゲームを始める前に所持金（ゴールド）をベットします。ベット額は100ゴールド、300ゴールド、500ゴールド、1000ゴールド、または全額ベットから選択できます。
+        </p>
+        <p>
+            ゲームが終了すると、勝利者にはベットの2倍が報酬として加算され、敗北者にはベット額が減少します。引き分けの場合はゴールドの変動はありません。
+        </p>
+        <h3>ラウンド数</h3>
+        <p>
+            1ゲームあたり5ラウンドで行われます。5ラウンド終了後、スコアに基づいて勝敗が決定されます。
+        </p>
+        <h3>ゲーム履歴</h3>
+        <p>
+            プレイしたゲームの履歴は保存され、後で確認することができます。履歴にはスコアの推移やゴールドの変動が表示されます。
+        </p>
+        <button id="start-button">ゲームを開始する</button>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        // ミュートボタンの機能追加（必要に応じて）
+        const muteButton = document.getElementById('mute-button');
+        const bgm = document.getElementById('bgm');
+
+        muteButton.addEventListener('click', () => {
+            if (bgm.muted) {
+                bgm.muted = false;
+                muteButton.innerText = 'ミュート';
+            } else {
+                bgm.muted = true;
+                muteButton.innerText = '音声オン';
+            }
+        });
+
+        // ゲーム開始ボタンのクリックイベント
+        const startButton = document.getElementById('start-button');
+        startButton.addEventListener('click', () => {
+            window.location.href = 'b.html';
+        });
+
+        // 背景音楽の設定（必要に応じて）
+        // ゲーム開始ページでBGMが再生される場合、ここで設定するか、別途設定してください。
+        // 例:
+        // <audio id="bgm" src="assets/sounds/janken_bgm.mp3" autoplay loop></audio>
+    </script>
+</body>
+</html>
